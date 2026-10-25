@@ -8,12 +8,14 @@ async def main():
     if len(sys.argv) < 2:
         print("no website provided")
         sys.exit(1)
-    if len(sys.argv) > 2:
+    if len(sys.argv) > 4:
         print("too many arguments provided")
         sys.exit(1)
     BASE_URL = sys.argv[1]
     print(f"starting crawl of: {BASE_URL}")
-    page_datas = await crawl_site_async(BASE_URL)
+    max_concurrency = int(sys.argv[2])
+    max_pages = int(sys.argv[3])
+    page_datas = await crawl_site_async(BASE_URL, max_concurrency, max_pages)
     for page_data in page_datas.values():
         print(f"Number of Pages Found: {len(page_data)}")
         for page_content in page_data.values():
