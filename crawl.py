@@ -51,3 +51,13 @@ def get_images_from_html(html, base_url):
     for img in imgs:
         urls.append(urljoin(base_url, img.get("src", "ERROR: Missing img src")))
     return urls
+
+
+def extract_page_data(html: str, page_url: str):
+    return {
+            "url": page_url,
+            "heading": get_heading_from_html(html),
+            "first_paragraph": get_first_paragraph_from_html(html),
+            "outgoing_links": get_urls_from_html(html, page_url),
+            "image_urls": get_images_from_html(html, page_url),
+        }
