@@ -1,7 +1,7 @@
 from urllib.parse import urljoin, urlsplit
 from bs4 import BeautifulSoup
 import requests
-
+import urllib.parse
 
 def normalize_url(url):
     url_parts = urlsplit(url)
@@ -68,7 +68,21 @@ def get_html(url):
     response = requests.get(url, headers={"User-Agent": "BootCrawler/1.0"})
     if response.status_code >= 400:
         raise Exception("Error: status code >= 400")
-    if response.headers["content-type"] != "text/html":
+    if "text/html" not in response.headers["content-type"]:
         raise Exception("Error: content type not text/html")
     response.raise_for_status()
     return response.text
+
+
+def crawl_page(base_url, current_url=None, page_data=None):
+    if base_url not in current_url:
+        return
+    normalize_current_url = normalize_url(current_url)
+    if normalize_current_url in page_data:
+        return
+    print(f"Getting html from {current_url}")
+    html = get_html(current_url)
+    current_page_data = extract_page_data(html, current_url)
+    page_data[normalize_current_url] = current_page_data
+    for current_url in current_page_data["outgoing_links"]:
+        crawl_page(base_url, current_url, page_data)
