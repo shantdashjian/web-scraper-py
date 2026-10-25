@@ -1,5 +1,6 @@
 from urllib.parse import urljoin, urlsplit
 from bs4 import BeautifulSoup
+import requests
 
 
 def normalize_url(url):
@@ -61,3 +62,13 @@ def extract_page_data(html: str, page_url: str):
             "outgoing_links": get_urls_from_html(html, page_url),
             "image_urls": get_images_from_html(html, page_url),
         }
+
+
+def get_html(url):
+    response = requests.get(url, headers={"User-Agent": "BootCrawler/1.0"})
+    if response.status_code >= 400:
+        raise Exception("Error: status code >= 400")
+    if response.headers["content-type"] != "text/html":
+        raise Exception("Error: content type not text/html")
+    response.raise_for_status()
+    return response.text
